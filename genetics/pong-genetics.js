@@ -13,7 +13,6 @@ var centered = window.innerWidth;
 canvas.width = width;
 canvas.height = height;
 var score = 0;
-console.log(score);
 var context = canvas.getContext('2d');
 
 
@@ -87,6 +86,7 @@ class OutNode {
 }
 
 getOutput = function(){
+	console.log(this.a * this.node1.outputNum() + this.b * this.node2.outputNum());
     return this.a * this.node1.outputNum() + this.b * this.node2.outputNum();
 };
 putFit = function(val)  {
@@ -110,6 +110,7 @@ outputNum = function(){
 var GaussianDist = function(mean, std){
   var temp1 = Math.sqrt(2 * Math.exp(1.0 / Math.random()));
   var temp2 = Math.cos(2 * 3.14 * Math.random());
+	console.log(temp1*temp2);
   return temp1 * temp2;
 };
 class Population {
@@ -125,13 +126,14 @@ class Population {
 			}
 			return this.n2;
 		};
-		setFitnessN1 = function (fit)	  {
+		setFitness = function (fit, n)	  {
+			if (n == 0) {
 	    this.n1.fit = fit;
 			this.node = 1;
-	  };
-		setFitnessN2 = function (fit)	  {
-	    this.n2.fit = fit;
-			this.node = 0;
+		}
+		else {
+			this.n2.fit = fit;
+		}
 	  };
 		remove = function()	  {
 	    if(this.n1.fit < this.n2.fit)
@@ -193,6 +195,7 @@ Ball.prototype.update = function (paddle1, paddle2) {
 		this.y_speed = 3;
 		this.x = 200;
 		this.y = 300;// set fitness to the node switch nodes
+		pop.setFitness(score, 0);
 	}
 
 	if (top_y > 300) {
@@ -201,7 +204,7 @@ Ball.prototype.update = function (paddle1, paddle2) {
 			this.y_speed = -3;
 			this.x_speed += (paddle1.x_speed / 2);
 			this.y += this.y_speed;
-			score = score + 1;
+			score += 600;
 		}
 	} else {
 		if (top_y < (paddle2.y + paddle2.height) && bottom_y > paddle2.y && top_x < (paddle2.x + paddle2.width) && bottom_x > paddle2.x) {
@@ -215,14 +218,14 @@ Ball.prototype.update = function (paddle1, paddle2) {
 var node = pop.n1;
 Player.prototype.update = function () {
 	 	var value = node.getOutput();
-		if (value < 0) { // left arrow
+		if (value < 0.0) { // left arrow
 			this.paddle.move(-4, 0);
-		} else if (value > 0) { // right arrow
+		} else if (value > 0.0) { // right arrow
 			this.paddle.move(4, 0);
 		} else {
 			this.paddle.move(0, 0);
 		}
-
+		score += 600 - Math.sqrt(Math.pow(Player.x - Ball.x, 2) - Math.pow(Player.y - Ball.y));
 };
 
 Paddle.prototype.move = function (x, y) {
