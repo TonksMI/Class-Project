@@ -13,10 +13,10 @@ body{
 }
 
 article:before {
+    background-image: linear-gradient(#C41E3A,#C41E3A,white);
     line-height: 100px;
     text-align: center;
     font-size: 32px;
-    background-color: #C41E3A;
     content: "Learning with AI";
     position: absolute;
     top: 0;
