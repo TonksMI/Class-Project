@@ -1,7 +1,7 @@
 # Charlie Liu 
 
 - 2274468
-- lu305@mail.chapman.edu
+- liu305@mail.chapman.edu
 
 ## contributions
 
