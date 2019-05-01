@@ -12,7 +12,7 @@ var height = 600;
 var centered = window.innerWidth;
 canvas.width = width;
 canvas.height = height;
-var score = 0;
+var score = 1;
 var context = canvas.getContext('2d');
 
 
@@ -30,13 +30,15 @@ var step = function () {
 var update = function () {
 };
 
-function Paddle(x, y, width, height) {
+function Paddle(x, y, width, height, type) {
 	this.x = x;
 	this.y = y;
 	this.width = width;
 	this.height = height;
 	this.x_speed = 0;
 	this.y_speed = 0;
+	this.score = 0;
+	this.type = type;
 };
 
 Paddle.prototype.render = function () {
@@ -45,11 +47,11 @@ Paddle.prototype.render = function () {
 };
 
 function Player() {
-	this.paddle = new Paddle(175, 580, 50, 10);
+	this.paddle = new Paddle(175, 580, 50, 10, 1);
 };
 
 function Computer() {
-	this.paddle = new Paddle(175, 10, 50, 10);
+	this.paddle = new Paddle(175, 10, 50, 10, 0);
 };
 
 Player.prototype.render = function () {
@@ -66,7 +68,7 @@ function Ball(x, y) {
 	this.x_speed = 1;
 	this.y_speed = 3;
 	this.radius = 5;
-}
+};
 
 Ball.prototype.render = function () {
 	context.beginPath();
@@ -78,16 +80,15 @@ Ball.prototype.render = function () {
 class OutNode {
 	constructor(a, b,  var1, var2, var3, var4, var5, var6, var7, var8, var9, var10, var11, var12)
 {
-  this.a = a;
-  this.b = b;
+  this.a = GaussianDist(a,2);
+  this.b = GaussianDist(b,2);
 	this.fit = 0;
   this.node1 = new Node(var1, var2, var3, var4, var5, var6);
   this.node2 = new Node(var7, var8, var9, var10, var11, var12);
 }
 
-getOutput = function(){
-	console.log(this.a * this.node1.outputNum() + this.b * this.node2.outputNum());
-    return this.a * this.node1.outputNum() + this.b * this.node2.outputNum();
+getOutput = function(ball, player){
+    return this.a * this.node1.outputNum(ball, player) + this.b * this.node2.outputNum(ball, player);
 };
 putFit = function(val)  {
     this.fit = val;
@@ -96,28 +97,26 @@ putFit = function(val)  {
 class Node
 {
 	constructor (var1, var2, var3, var4, var5, var6) {
-  this.a = var1;
-  this.b = var2;
-  this.c = var3;
-  this.d = var4;
-  this.e = var5;
-  this.f = var6;
+  this.a = GaussianDist(var1,2);
+  this.b = GaussianDist(var2,2);
+  this.c = GaussianDist(var3,2);
+  this.d = GaussianDist(var4,2);
+  this.e = GaussianDist(var5,2);
+  this.f = GaussianDist(var6,2);
 }
-outputNum = function(){
-  return this.a * Ball.x + this.b * Ball.y + this.c * Ball.x_speed + this.d * Ball.y_speed + this.e * Player.x + this.f * Player.y;
+outputNum = function(ball, player){
+  return this.a * ball.x + this.b * ball.y + this.c * ball.x_speed + this.d * ball.y_speed + this.e * player.paddle.x + this.f * player.paddle.y;
 };
 };
 var GaussianDist = function(mean, std){
   var temp1 = Math.sqrt(2 * Math.exp(1.0 / Math.random()));
   var temp2 = Math.cos(2 * 3.14 * Math.random());
-	console.log(temp1*temp2);
   return temp1 * temp2;
 };
 class Population {
 	constructor (){
-  this.n1 = new OutNode(GaussianDist(0, 5), GaussianDist(0, 5),GaussianDist(0, 5),GaussianDist(0, 5),GaussianDist(0, 5),GaussianDist(0, 5),GaussianDist(0, 5),GaussianDist(0, 5),GaussianDist(0, 5),GaussianDist(0, 5),GaussianDist(0, 5),GaussianDist(0, 5),GaussianDist(0, 5),GaussianDist(0, 5));
-  this.n2 = new OutNode(GaussianDist(0, 5), GaussianDist(0, 5),GaussianDist(0, 5),GaussianDist(0, 5),GaussianDist(0, 5),GaussianDist(0, 5),GaussianDist(0, 5),GaussianDist(0, 5),GaussianDist(0, 5),GaussianDist(0, 5),GaussianDist(0, 5),GaussianDist(0, 5),GaussianDist(0, 5),GaussianDist(0, 5));
-	this.node = 0;
+  this.n1 = new OutNode(0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+  this.n2 = new OutNode(0,0,0,0,0,0,0,0,0,0,0,0,0,0);
 }
 	getOutNode = function ()		{
 			if (this.node == 0)
@@ -126,22 +125,17 @@ class Population {
 			}
 			return this.n2;
 		};
-		setFitness = function (fit, n)	  {
-			if (n == 0) {
-	    this.n1.fit = fit;
-			this.node = 1;
-		}
-		else {
-			this.n2.fit = fit;
-		}
+		setFitness = function (fit)	  {
+	    this.n2.fit = fit;
 	  };
 		remove = function()	  {
 	    if(this.n1.fit < this.n2.fit)
 	    {
-	      this.n1 = new outNode(GaussianDist(this.n2.a, 5), GaussianDist(this.n2.b, 5),GaussianDist(this.n2.c, 5),GaussianDist(this.n2.d, 5),GaussianDist(this.n2.e, 5),GaussianDist(this.n2.f, 5),GaussianDist(this.n2.node1.a, 5),GaussianDist(this.n2.node1.b, 5),GaussianDist(this.n2.node1.c, 5),GaussianDist(this.n2.node1.d, 5),GaussianDist(this.n2.node1.e, 5),GaussianDist(this.n2.node1.f, 5),GaussianDist(this.n2.node2.a, 5),GaussianDist(this.n2.node2.b, 5),GaussianDist(this.n2.node2.c, 5),GaussianDist(this.n2.node2.d, 5),GaussianDist(this.n2.node2.e, 5),GaussianDist(this.n2.node2.f, 5));
+	      this.n1 = this.n2;
+				console.log(this.n1.fit);
 	    }
 	    else {
-	      this.n2 = new outNode(GaussianDist(this.n1.a, 5), GaussianDist(this.n1.b, 5),GaussianDist(this.n1.c, 5),GaussianDist(this.n1.d, 5),GaussianDist(this.n1.e, 5),GaussianDist(this.n1.f, 5),GaussianDist(this.n1.node1.a, 5),GaussianDist(this.n1.node1.b, 5),GaussianDist(this.n1.node1.c, 5),GaussianDist(this.n1.node1.d, 5),GaussianDist(this.n1.node1.e, 5),GaussianDist(this.n1.node1.f, 5),GaussianDist(this.n1.node2.a, 5),GaussianDist(this.n1.node2.b, 5),GaussianDist(this.n1.node2.c, 5),GaussianDist(this.n1.node2.d, 5),GaussianDist(this.n1.node2.e, 5),GaussianDist(this.n1.node2.f, 5));
+	      this.n2 = new OutNode(this.n1.a, this.n1.b,this.n1.node1.a,this.n1.node1.b,this.n1.node1.c,this.n1.node1.d,this.n1.node1.e,this.n1.node1.f,this.n1.node2.a,this.n1.node2.b,this.n1.node2.c,this.n1.node2.d,this.n1.node2.e,this.n1.node2.f);
 	    }
 	  };
 };
@@ -194,8 +188,12 @@ Ball.prototype.update = function (paddle1, paddle2) {
 		this.x_speed = 1;
 		this.y_speed = 3;
 		this.x = 200;
-		this.y = 300;// set fitness to the node switch nodes
-		pop.setFitness(score, 0);
+		this.y = 300;// set fitness to the node check if better
+		paddle1.x = 175;
+		paddle1.y = 580;
+		pop.setFitness(paddle1.score);
+		pop.remove();
+		paddle1.score = 0;
 	}
 
 	if (top_y > 300) {
@@ -204,7 +202,7 @@ Ball.prototype.update = function (paddle1, paddle2) {
 			this.y_speed = -3;
 			this.x_speed += (paddle1.x_speed / 2);
 			this.y += this.y_speed;
-			score += 600;
+			paddle1.score += 600;
 		}
 	} else {
 		if (top_y < (paddle2.y + paddle2.height) && bottom_y > paddle2.y && top_x < (paddle2.x + paddle2.width) && bottom_x > paddle2.x) {
@@ -215,20 +213,21 @@ Ball.prototype.update = function (paddle1, paddle2) {
 		}
 	}
 };
-var node = pop.n1;
-Player.prototype.update = function () {
-	 	var value = node.getOutput();
+Player.prototype.update = function (ball) {
+	var node = pop.n2;
+	 	var value = node.getOutput(ball, this);
 		if (value < 0.0) { // left arrow
-			this.paddle.move(-4, 0);
+			this.paddle.move(-4, 0, ball);
 		} else if (value > 0.0) { // right arrow
-			this.paddle.move(4, 0);
-		} else {
-			this.paddle.move(0, 0);
+			this.paddle.move(4, 0, ball);
 		}
-		score += 600 - Math.sqrt(Math.pow(Player.x - Ball.x, 2) - Math.pow(Player.y - Ball.y));
+		if(Math.sqrt(Math.pow(this.paddle.x - ball.x, 2) - Math.pow(this.paddle.y - ball.y, 2)) > 0)
+		{
+			this.paddle.score = this.paddle.score + 100 - Math.sqrt(Math.pow(this.paddle.x - ball.x, 2) - Math.pow(this.paddle.y - ball.y, 2));
+		}
 };
 
-Paddle.prototype.move = function (x, y) {
+Paddle.prototype.move = function (x, y, ball) {
 	this.x += x;
 	this.y += y;
 	this.x_speed = x;
@@ -236,14 +235,38 @@ Paddle.prototype.move = function (x, y) {
 	if (this.x < 0) { // all the way to the left
 		this.x = 0;
 		this.x_speed = 0;
+		if(this.type == 1)
+		{
+			ball.x = 200;
+			ball.y = 300;
+			this.x = 175;
+			this.y = 580;
+			ball.x_speed = 1;
+			ball.y_speed = 3;
+			pop.setFitness(this.score);
+			pop.remove();
+			this.score = 0;
+		}
 	} else if (this.x + this.width > 400) { // all the way to the right
 		this.x = 400 - this.width;
 		this.x_speed = 0;
+		if(this.type == 1)
+		{
+			ball.x = 200;
+			ball.y = 300;
+			ball.x_speed = 1;
+			ball.y_speed = 3;
+			this.x = 175;
+			this.y = 580;
+			pop.setFitness(this.score);
+			pop.remove();
+			this.score = 0;
+		}
 	}
 };
 
 var update = function () {
-	player.update();
+	player.update(ball);
 	computer.update(ball);
 	ball.update(player.paddle, computer.paddle);
 };
