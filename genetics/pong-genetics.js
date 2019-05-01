@@ -80,8 +80,8 @@ Ball.prototype.render = function () {
 class OutNode {
 	constructor(a, b,  var1, var2, var3, var4, var5, var6, var7, var8, var9, var10, var11, var12)
 {
-  this.a = GaussianDist(a,2);
-  this.b = GaussianDist(b,2);
+  this.a = GaussianDist(a,1);
+  this.b = GaussianDist(b,1);
 	this.fit = 0;
   this.node1 = new Node(var1, var2, var3, var4, var5, var6);
   this.node2 = new Node(var7, var8, var9, var10, var11, var12);
@@ -97,12 +97,12 @@ putFit = function(val)  {
 class Node
 {
 	constructor (var1, var2, var3, var4, var5, var6) {
-  this.a = GaussianDist(var1,2);
-  this.b = GaussianDist(var2,2);
-  this.c = GaussianDist(var3,2);
-  this.d = GaussianDist(var4,2);
-  this.e = GaussianDist(var5,2);
-  this.f = GaussianDist(var6,2);
+  this.a = GaussianDist(var1,1);
+  this.b = GaussianDist(var2,1);
+  this.c = GaussianDist(var3,1);
+  this.d = GaussianDist(var4,1);
+  this.e = GaussianDist(var5,1);
+  this.f = GaussianDist(var6,1);
 }
 outputNum = function(ball, player){
   return this.a * ball.x + this.b * ball.y + this.c * ball.x_speed + this.d * ball.y_speed + this.e * player.paddle.x + this.f * player.paddle.y;
@@ -155,9 +155,7 @@ var render = function () {
 	ball.render();
 };
 
-var update = function () {
-	ball.update();
-};
+
 
 Ball.prototype.update = function () {
 	this.x += this.x_speed;
